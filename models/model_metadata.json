@@ -1,0 +1,76 @@
+{
+    "model_name": "LightGBM Classifier",
+    "task": "Loan Recovery Probability Estimation",
+    "training_sample_size": 3017,
+    "test_sample_size": 755,
+    "metrics": {
+        "Accuracy": 0.9987,
+        "Precision": 1.0,
+        "Recall": 0.998,
+        "F1-Score": 0.999,
+        "ROC-AUC": 0.9996,
+        "PR-AUC": 0.9998
+    },
+    "benchmark_comparison": {
+        "Logistic Regression": {
+            "Accuracy": 0.9483,
+            "Precision": 0.9978,
+            "Recall": 0.9243,
+            "F1-Score": 0.9597,
+            "ROC-AUC": 0.9915,
+            "PR-AUC": 0.9963
+        },
+        "Random Forest": {
+            "Accuracy": 0.9987,
+            "Precision": 1.0,
+            "Recall": 0.998,
+            "F1-Score": 0.999,
+            "ROC-AUC": 1.0,
+            "PR-AUC": 1.0
+        },
+        "XGBoost": {
+            "Accuracy": 0.9987,
+            "Precision": 1.0,
+            "Recall": 0.998,
+            "F1-Score": 0.999,
+            "ROC-AUC": 0.9999,
+            "PR-AUC": 1.0
+        },
+        "LightGBM": {
+            "Accuracy": 0.9987,
+            "Precision": 1.0,
+            "Recall": 0.998,
+            "F1-Score": 0.999,
+            "ROC-AUC": 0.9996,
+            "PR-AUC": 0.9998
+        }
+    },
+    "features": {
+        "numeric": [
+            "credit_score",
+            "annual_income",
+            "loan_amount",
+            "interest_rate",
+            "loan_term_months",
+            "overdue_days",
+            "dti_ratio",
+            "ltv_ratio",
+            "is_secured",
+            "contact_attempts",
+            "promise_to_pay_kept",
+            "settlement_discount_pct",
+            "delinquency_severity_score"
+        ],
+        "categorical": [
+            "loan_type",
+            "region",
+            "city_tier",
+            "employment_status",
+            "housing_status",
+            "collateral_type",
+            "origination_channel",
+            "primary_channel"
+        ]
+    },
+    "optimal_recovery_threshold": 0.5
+}
