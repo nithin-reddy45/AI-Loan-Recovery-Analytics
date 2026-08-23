@@ -80,7 +80,8 @@ def render_week9():
                 Avg_Loan=("loan_amount", "mean") if "loan_amount" in df.columns else ("loan_type", "count")
             )
             fig_type = px.bar(
-                type_agg, x="loan_type", y="Total_Recovered", color="loan_type",
+                type_agg, x="loan_type", y="Total_Recovered",
+                color="Total_Recovered", color_continuous_scale="Viridis",
                 title="<b>Total Amount Recovered ($) by Loan Product Line</b>",
                 template="plotly_white"
             )
@@ -98,19 +99,17 @@ def render_week9():
     with g_c2:
         # Chart 2: Default Rate by Region
         if "region" in df.columns:
-            reg_agg = df.groupby("region", as_index=False).agg(
-                Default_Rate=("default_flag", "mean") if "default_flag" in df.columns else ("region", "count"),
-                Count=("region", "count")
-            )
             if "default_flag" in df.columns:
-                reg_agg["Default_Rate"] = (reg_agg["Default_Rate"] * 100).round(2)
+                reg_agg = df.groupby("region", as_index=False)["default_flag"].mean()
+                reg_agg["Default_Rate"] = (reg_agg["default_flag"] * 100).round(2)
                 fig_reg = px.bar(
                     reg_agg, x="region", y="Default_Rate", color="Default_Rate",
                     color_continuous_scale="Reds", title="<b>Gross Default (NPA) Rate by Geographic Region (%)</b>",
                     template="plotly_white"
                 )
             else:
-                fig_reg = px.bar(reg_agg, x="region", y="Count", color="region", title="<b>Regional Distribution</b>", template="plotly_white")
+                reg_agg = df.groupby("region", as_index=False).size().rename(columns={"size": "Count"})
+                fig_reg = px.bar(reg_agg, x="region", y="Count", color_discrete_sequence=["#38bdf8"], title="<b>Regional Distribution</b>", template="plotly_white")
             st.plotly_chart(fig_reg, use_container_width=True)
             
         # Chart 4: Recovered Amount by Primary Channel Boxplot
@@ -118,11 +117,11 @@ def render_week9():
             rec_sub = df[df["recovered_amount"] > 0]
             if len(rec_sub) > 0:
                 fig_chan = px.box(
-                    rec_sub, x="primary_channel", y="recovered_amount", color="primary_channel",
+                    rec_sub, x="primary_channel", y="recovered_amount",
                     title="<b>Recovery Dollars Spread by Primary Collection Channel</b>",
+                    color_discrete_sequence=["#38bdf8"],
                     template="plotly_white"
                 )
-                fig_chan.update_layout(showlegend=False)
                 st.plotly_chart(fig_chan, use_container_width=True)
 
     # -------------------------------------------------------------
