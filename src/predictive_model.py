@@ -1,8 +1,3 @@
-"""
-Predictive Analytics Module: AI-Driven Loan Recovery & Risk Analytics
-Trains, tunes, and evaluates machine learning classification models (LightGBM, XGBoost, Random Forest, Logistic Regression)
-to predict the probability of loan recovery and optimize collector assignment.
-"""
 
 import os
 import json

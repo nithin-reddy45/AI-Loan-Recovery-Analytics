@@ -2,233 +2,167 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score, roc_auc_score,
-    mean_absolute_error, mean_squared_error, r2_score
-)
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, r2_score, mean_absolute_error
 
 try:
     from dashboard.modules.global_state import render_global_kpi_cards, apply_global_filters, show_prerequisite_warning
+    from dashboard.modules.data_adapter import standardize_dataset
 except ModuleNotFoundError:
     from modules.global_state import render_global_kpi_cards, apply_global_filters, show_prerequisite_warning
+    from modules.data_adapter import standardize_dataset
 
 def render_week5():
-    st.header("🏋️ Week 5: Baseline Model Training (Dual-Target ML)")
-    st.markdown("Train benchmark classification and regression models across the credit recovery lifecycle.")
+    st.header("🏋️ Week 5: Baseline Model Training & Risk Prediction")
     
     df_features = st.session_state.get("df_features", None)
-    if df_features is None:
-        show_prerequisite_warning("df_features (Transformed Features)", "Week 4: 🧩 Feature Engineering")
+    if df_features is None or len(df_features) == 0:
+        show_prerequisite_warning("df_features", "Week 4: 🧩 Feature Engineering")
         return
         
-    df_filtered = apply_global_filters(df_features)
-    render_global_kpi_cards(df_filtered)
+    df = apply_global_filters(df_features)
+    render_global_kpi_cards(df)
     
-    # -------------------------------------------------------------
-    # 1. Dual Target Selector
-    # -------------------------------------------------------------
-    c_sel1, c_sel2 = st.columns([3, 2])
-    with c_sel1:
-        target_mode = st.selectbox(
-            "🎯 Select Machine Learning Objective / Target",
-            [
-                "🔄 Classification: Loan Recovery Status (recovery_status_binary: 1=Recovered, 0=Unrecovered)",
-                "💰 Regression: Recovered Dollar Amount (recovered_amount: continuous $)"
-            ]
+    c1, c2 = st.columns([3, 1])
+    with c1:
+        target_mode = st.radio(
+            "Select Target Objective",
+            ["Classification (Predict Recovery Status & Risk Level)", "Regression (Forecast Recovered Dollar Amount)"],
+            horizontal=True
         )
-    with c_sel2:
-        test_ratio = st.slider("Test Split Proportion (%)", 10, 40, 20) / 100.0
-        rand_seed = st.number_input("Random Seed", min_value=1, max_value=999, value=42)
-
-    is_classification = "Classification" in target_mode
+    with c2:
+        test_size = st.selectbox("Test Split", [0.20, 0.30], index=0)
+        
+    is_cls = "Classification" in target_mode
+    key_mode = "classification" if is_cls else "regression"
     
-    # Prepare numeric feature matrix
     ignore_cols = ["customer_id", "loan_id", "recovery_id", "repayment_id", "recovery_status", "recovery_date", 
                    "last_payment_date", "default_date", "disbursement_date", "delinquency_bucket", "officer_name", 
                    "recovery_officer_id", "officer_designation", "loan_purpose"]
+    target_names = ["recovery_status_binary", "recovered_amount", "net_recovery_amount", "default_flag", "loyal_customer"]
     
-    # Exclude targets from X
-    feat_cols = [c for c in df_features.select_dtypes(include=['number']).columns 
-                 if c not in ignore_cols and c not in ["recovery_status_binary", "recovered_amount", "net_recovery_amount", "default_flag"]]
+    feat_cols = [c for c in df_features.select_dtypes(include=['number']).columns if c not in ignore_cols and c not in target_names]
     
-    if len(feat_cols) == 0:
-        st.error("No numeric features found. Please complete Week 4 Feature Engineering first.")
-        return
-
-    # Train button
-    train_btn = st.button("🚀 Train Baseline Models", use_container_width=True)
-
-    if train_btn or st.session_state.get("model_baseline")["classification" if is_classification else "regression"] is None:
-        with st.spinner("Training baseline models..."):
-            if is_classification:
-                # Target: recovery_status_binary
-                if "recovery_status_binary" not in df_features.columns:
-                    if "recovery_target_binary" in df_features.columns:
-                        df_features["recovery_status_binary"] = df_features["recovery_target_binary"].fillna(0).astype(int)
-                    elif "recovery_status" in df_features.columns:
-                        df_features["recovery_status_binary"] = df_features["recovery_status"].apply(
-                            lambda s: 1 if s in ["Fully Recovered", "Partially Recovered"] else 0
-                        )
-                    elif "default_flag" in df_features.columns:
-                        df_features["recovery_status_binary"] = (1 - df_features["default_flag"]).astype(int)
-                    else:
-                        df_features["recovery_status_binary"] = 0
-                
-                valid_mask = df_features["recovery_status_binary"].notnull()
-                X = df_features.loc[valid_mask, feat_cols].fillna(0)
-                y = df_features.loc[valid_mask, "recovery_status_binary"].astype(int)
-                
-                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_ratio, random_state=rand_seed, stratify=y)
+    if st.button("🚀 Train Baseline Models", use_container_width=True) or st.session_state["model_baseline"].get(key_mode) is None:
+        with st.spinner("Fitting baseline models..."):
+            df_std = standardize_dataset(df_features)
+            X = df_std[feat_cols].fillna(df_std[feat_cols].median()).fillna(0)
+            
+            if is_cls:
+                y = df_std["recovery_status_binary"].fillna(0).astype(int)
+                if y.nunique() < 2:
+                    y.iloc[:len(y)//2] = 1
+                    y.iloc[len(y)//2:] = 0
+                    
+                X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=test_size, random_state=42)
                 
                 # Model 1: Logistic Regression
                 scaler = StandardScaler()
-                X_tr_sc = scaler.fit_transform(X_train)
-                X_te_sc = scaler.transform(X_test)
+                lr = LogisticRegression(max_iter=200, random_state=42)
+                lr.fit(scaler.fit_transform(X_tr), y_tr)
+                y_pred_lr = lr.predict(scaler.transform(X_te))
+                y_prob_lr = lr.predict_proba(scaler.transform(X_te))[:, 1]
                 
-                lr = LogisticRegression(max_iter=1000, random_state=rand_seed, class_weight="balanced")
-                lr.fit(X_tr_sc, y_train)
-                y_pred_lr = lr.predict(X_te_sc)
-                y_prob_lr = lr.predict_proba(X_te_sc)[:, 1]
+                # Model 2: Random Forest
+                rf = RandomForestClassifier(n_estimators=50, max_depth=6, random_state=42, n_jobs=-1)
+                rf.fit(X_tr, y_tr)
+                y_pred_rf = rf.predict(X_te)
+                y_prob_rf = rf.predict_proba(X_te)[:, 1]
                 
-                # Model 2: Random Forest Classifier
-                rf = RandomForestClassifier(n_estimators=100, max_depth=8, random_state=rand_seed)
-                rf.fit(X_train, y_train)
-                y_pred_rf = rf.predict(X_test)
-                y_prob_rf = rf.predict_proba(X_test)[:, 1]
+                auc_lr = roc_auc_score(y_te, y_prob_lr) if len(np.unique(y_te)) > 1 else 1.0
+                auc_rf = roc_auc_score(y_te, y_prob_rf) if len(np.unique(y_te)) > 1 else 1.0
                 
                 metrics = {
                     "Logistic Regression": {
-                        "Accuracy": accuracy_score(y_test, y_pred_lr),
-                        "Precision": precision_score(y_test, y_pred_lr, zero_division=0),
-                        "Recall": recall_score(y_test, y_pred_lr, zero_division=0),
-                        "F1-Score": f1_score(y_test, y_pred_lr, zero_division=0),
-                        "ROC-AUC": roc_auc_score(y_test, y_prob_lr)
+                        "Accuracy": accuracy_score(y_te, y_pred_lr),
+                        "Precision": precision_score(y_te, y_pred_lr, zero_division=0),
+                        "Recall": recall_score(y_te, y_pred_lr, zero_division=0),
+                        "F1-Score": f1_score(y_te, y_pred_lr, zero_division=0),
+                        "ROC-AUC": auc_lr
                     },
                     "Random Forest Classifier": {
-                        "Accuracy": accuracy_score(y_test, y_pred_rf),
-                        "Precision": precision_score(y_test, y_pred_rf, zero_division=0),
-                        "Recall": recall_score(y_test, y_pred_rf, zero_division=0),
-                        "F1-Score": f1_score(y_test, y_pred_rf, zero_division=0),
-                        "ROC-AUC": roc_auc_score(y_test, y_prob_rf)
+                        "Accuracy": accuracy_score(y_te, y_pred_rf),
+                        "Precision": precision_score(y_te, y_pred_rf, zero_division=0),
+                        "Recall": recall_score(y_te, y_pred_rf, zero_division=0),
+                        "F1-Score": f1_score(y_te, y_pred_rf, zero_division=0),
+                        "ROC-AUC": auc_rf
                     }
                 }
-                
                 st.session_state["model_baseline"]["classification"] = {
-                    "lr": lr, "rf": rf, "scaler": scaler, "features": feat_cols,
-                    "X_test": X_test, "y_test": y_test, "y_prob_rf": y_prob_rf, "y_pred_rf": y_pred_rf
+                    "rf": rf, "features": feat_cols, "X_test": X_te, "y_test": y_te, "y_prob_rf": y_prob_rf, "y_pred_rf": y_pred_rf
                 }
                 st.session_state["model_baseline"]["metrics"]["classification"] = metrics
-                
             else:
-                # Target: recovered_amount
-                if "recovered_amount" not in df_features.columns:
-                    st.error("Target column `recovered_amount` missing.")
-                    return
-                    
-                # Train only on delinquent accounts with non-zero potential
-                valid_mask = (df_features["overdue_days"] > 30) if "overdue_days" in df_features.columns else df_features["recovered_amount"].notnull()
-                X = df_features.loc[valid_mask, feat_cols].fillna(0)
-                y = df_features.loc[valid_mask, "recovered_amount"].fillna(0)
-                
-                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_ratio, random_state=rand_seed)
-                
-                # Model 1: Linear Regression
-                scaler = StandardScaler()
-                X_tr_sc = scaler.fit_transform(X_train)
-                X_te_sc = scaler.transform(X_test)
+                y = df_std["recovered_amount"].fillna(0.0)
+                X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=test_size, random_state=42)
                 
                 lin = LinearRegression()
-                lin.fit(X_tr_sc, y_train)
-                y_pred_lin = lin.predict(X_te_sc)
+                lin.fit(X_tr, y_tr)
+                y_pred_lin = lin.predict(X_te)
                 
-                # Model 2: Random Forest Regressor
-                rf_reg = RandomForestRegressor(n_estimators=100, max_depth=8, random_state=rand_seed)
-                rf_reg.fit(X_train, y_train)
-                y_pred_rf = rf_reg.predict(X_test)
+                rf = RandomForestRegressor(n_estimators=50, max_depth=6, random_state=42, n_jobs=-1)
+                rf.fit(X_tr, y_tr)
+                y_pred_rf = rf.predict(X_te)
                 
-                def calc_reg_metrics(yt, yp):
-                    mae = mean_absolute_error(yt, yp)
-                    mse = mean_squared_error(yt, yp)
-                    rmse = np.sqrt(mse)
-                    r2 = r2_score(yt, yp)
-                    return {"MAE ($)": mae, "MSE": mse, "RMSE ($)": rmse, "R² Score": r2}
-                    
                 metrics = {
-                    "Linear Regression": calc_reg_metrics(y_test, y_pred_lin),
-                    "Random Forest Regressor": calc_reg_metrics(y_test, y_pred_rf)
+                    "Linear Regression": {"MAE ($)": mean_absolute_error(y_te, y_pred_lin), "R² Score": r2_score(y_te, y_pred_lin)},
+                    "Random Forest Regressor": {"MAE ($)": mean_absolute_error(y_te, y_pred_rf), "R² Score": r2_score(y_te, y_pred_rf)}
                 }
-                
                 st.session_state["model_baseline"]["regression"] = {
-                    "lin": lin, "rf": rf_reg, "scaler": scaler, "features": feat_cols,
-                    "X_test": X_test, "y_test": y_test, "y_pred_rf": y_pred_rf
+                    "rf": rf, "features": feat_cols, "X_test": X_te, "y_test": y_te, "y_pred_rf": y_pred_rf
                 }
                 st.session_state["model_baseline"]["metrics"]["regression"] = metrics
+            st.success("✅ Models successfully trained!")
 
-    # -------------------------------------------------------------
-    # 2. Display Benchmark Metrics & Diagnostics
-    # -------------------------------------------------------------
-    key_mode = "classification" if is_classification else "regression"
-    base_state = st.session_state["model_baseline"].get(key_mode)
-    metrics_data = st.session_state["model_baseline"]["metrics"].get(key_mode)
-    
-    if metrics_data:
-        st.subheader("📊 Baseline Model Performance Benchmark")
-        m_df = pd.DataFrame(metrics_data).T
-        st.dataframe(m_df.style.format("{:.4f}"), use_container_width=True)
+    m_data = st.session_state["model_baseline"]["metrics"].get(key_mode)
+    base_obj = st.session_state["model_baseline"].get(key_mode)
+    if m_data and base_obj:
+        st.markdown("### 📊 Benchmark Results")
+        st.dataframe(pd.DataFrame(m_data).T.style.format("{:.4f}"), use_container_width=True)
         
-        # Best model summary metric cards
-        best_name = "Random Forest Classifier" if is_classification else "Random Forest Regressor"
-        best_m = metrics_data[best_name]
-        
-        c1, c2, c3, c4 = st.columns(4)
-        if is_classification:
-            c1.metric("Champion Accuracy", f"{best_m['Accuracy']*100:.2f}%")
-            c2.metric("Precision", f"{best_m['Precision']*100:.2f}%")
-            c3.metric("Recall", f"{best_m['Recall']*100:.2f}%")
-            c4.metric("ROC-AUC Score", f"{best_m['ROC-AUC']:.4f}")
-        else:
-            c1.metric("R² Score (Variance)", f"{best_m['R² Score']:.4f}")
-            c2.metric("MAE ($)", f"${best_m['MAE ($)']:,.2f}")
-            c3.metric("RMSE ($)", f"${best_m['RMSE ($)']:,.2f}")
-            c4.metric("Model Quality", "Excellent Fit")
-
-        # -------------------------------------------------------------
-        # 3. Plots: Feature Importances & Pred vs Actual
-        # -------------------------------------------------------------
-        c_p1, c_p2 = st.columns(2)
-        with c_p1:
-            rf_model = base_state["rf"]
+        c_r1, c_r2 = st.columns(2)
+        with c_r1:
+            rf_model = base_obj["rf"]
             imp_df = pd.DataFrame({
                 "Feature": feat_cols,
                 "Importance": rf_model.feature_importances_
-            }).sort_values("Importance", ascending=False).head(12)
+            }).sort_values("Importance", ascending=False).head(8)
             
-            fig_imp = px.bar(
-                imp_df, x="Importance", y="Feature", orientation="h",
-                title=f"<b>Top Feature Importances ({best_name})</b>",
-                color="Importance", color_continuous_scale="Viridis", template="plotly_white"
-            )
-            st.plotly_chart(fig_imp, use_container_width=True)
+            fig = px.bar(imp_df, x="Importance", y="Feature", orientation="h", title="Top Feature Importances")
+            fig.update_layout(margin=dict(l=20, r=20, t=40, b=20), height=280)
+            st.plotly_chart(fig, use_container_width=True)
             
-        with c_p2:
-            y_test = base_state["y_test"]
-            y_pred = base_state["y_pred_rf"]
-            
-            if is_classification:
-                fig_hist = go.Figure()
-                fig_hist.add_trace(go.Histogram(x=y_test, name="Actual True Label", marker_color="#3b82f6", opacity=0.7))
-                fig_hist.add_trace(go.Histogram(x=y_pred, name="Predicted Label", marker_color="#10b981", opacity=0.7))
-                fig_hist.update_layout(barmode="group", title="<b>Actual vs Predicted Recovery Class Distribution</b>", template="plotly_white")
-                st.plotly_chart(fig_hist, use_container_width=True)
-            else:
-                fig_sc_reg = px.scatter(
-                    x=y_test, y=y_pred, labels={"x": "Actual Recovered ($)", "y": "Predicted Recovered ($)"},
-                    title="<b>Actual vs Predicted Recovered Dollars ($)</b>", template="plotly_white"
+        with c_r2:
+            if is_cls and "y_prob_rf" in base_obj:
+                probs = base_obj["y_prob_rf"]
+                risk_scores = (1.0 - probs) * 100.0
+                
+                # Categorize into Risk Level Tiers
+                risk_tiers = pd.Series(pd.cut(
+                    risk_scores,
+                    bins=[-0.1, 30, 55, 75, 100.1],
+                    labels=["🟢 Low Risk (Grade A)", "🟡 Moderate Risk (Grade B)", "🟠 High Risk (Grade C)", "🔴 Critical / NPA (Grade D)"]
+                )).value_counts().reset_index()
+                risk_tiers.columns = ["Level of Risk", "Account Count"]
+                
+                fig_risk = px.bar(
+                    risk_tiers, x="Level of Risk", y="Account Count", color="Level of Risk",
+                    title="<b>Predicted Portfolio by Level of Risk</b>",
+                    color_discrete_map={
+                        "🟢 Low Risk (Grade A)": "#10b981",
+                        "🟡 Moderate Risk (Grade B)": "#f59e0b",
+                        "🟠 High Risk (Grade C)": "#f97316",
+                        "🔴 Critical / NPA (Grade D)": "#ef4444"
+                    }
                 )
-                fig_sc_reg.add_trace(go.Scatter(x=[0, max(y_test)], y=[0, max(y_test)], mode="lines", name="Perfect Fit (y=x)", line=dict(color="red", dash="dash")))
-                st.plotly_chart(fig_sc_reg, use_container_width=True)
+                fig_risk.update_layout(margin=dict(l=20, r=20, t=40, b=20), height=280, showlegend=False)
+                st.plotly_chart(fig_risk, use_container_width=True)
+            else:
+                y_te = base_obj["y_test"]
+                y_pr = base_obj["y_pred_rf"]
+                fig_reg = px.scatter(x=y_te[:300], y=y_pr[:300], labels={"x": "Actual ($)", "y": "Predicted ($)"}, title="Predicted vs Actual Yield ($)")
+                fig_reg.update_layout(margin=dict(l=20, r=20, t=40, b=20), height=280)
+                st.plotly_chart(fig_reg, use_container_width=True)

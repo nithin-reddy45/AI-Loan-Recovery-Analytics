@@ -5,7 +5,6 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.54-red.svg)](https://streamlit.io/)
 [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.9-yellow.svg)](https://scikit-learn.org/)
 [![Plotly](https://img.shields.io/badge/Plotly_Express-6.5-brightgreen.svg)](https://plotly.com/)
-[![SQLite](https://img.shields.io/badge/SQLite-3-blue.svg)](https://www.sqlite.org/)
 
 ---
 
@@ -69,25 +68,16 @@ LoanRecovery/
 │   ├── predictive_model.py               # ML training (LightGBM, XGBoost, RF, LR) + metrics
 │   ├── generate_notebooks.py             # Automated notebook builder
 │   └── run_pipeline.py                   # Master end-to-end pipeline runner
-├── sql/                                  # Production SQL analytics engine
-│   ├── schema_and_load.sql               # Relational DDL with primary/foreign keys & indexes
-│   ├── advanced_sql_analytics.sql        # 15 Advanced queries (CTEs, Window Functions, Rollups)
-│   └── run_sql_analysis.py               # SQLite runner & Markdown table report generator
 ├── dashboard/                            # Business Intelligence & UI
 │   ├── app.py                            # Multi-tab interactive Streamlit BI Dashboard + AI Simulator
-│   └── powerbi/                          # Power BI architecture assets
-│       ├── powerbi_data_model_guide.md   # Star Schema dimensional blueprint & RLS policy
-│       ├── dax_measures_and_kpis.md      # 25+ Production DAX measures formula bank
-│       └── powerbi_visual_specifications.md # 4-Page report layout and visual configurations
+│   └── modules/                          # 9 Modular weekly components
 ├── reports/                              # Executive deliverables
 │   ├── executive_business_report.md      # Strategic C-suite recommendations & EWS framework
-│   ├── sql_query_results.md              # Complete output tables for 15 SQL queries
 │   └── figures/                          # Exported high-res PNG visual charts (11 plots)
 ├── models/                               # Serialized ML models & metadata
 │   ├── recovery_predictor_lightgbm.pkl   # Champion LightGBM pipeline
 │   ├── recovery_predictor_xgboost.pkl    # Challenger XGBoost pipeline
 │   └── model_metadata.json               # Benchmark metrics, hyperparameters, threshold rules
-├── loan_recovery.db                      # Relational SQLite database
 ├── requirements.txt                      # Project dependencies
 └── README.md                             # Documentation
 ```
@@ -100,10 +90,9 @@ LoanRecovery/
 |:---|:---|
 | **Core & Data Wrangling** | Python 3.11, Pandas, NumPy, Scipy |
 | **Statistical Visualization** | Matplotlib, Seaborn, Plotly Express & Graph Objects |
-| **Database & SQL Analytics** | SQLite 3, Relational Star Schema DDL, Advanced SQL (CTEs, Window Functions) |
 | **Machine Learning & AI** | Scikit-Learn, LightGBM, XGBoost, Random Forest, Logistic Regression, Joblib |
 | **Clustering & Unsupervised** | K-Means, Silhouette Analysis, Principal Component Analysis (PCA) |
-| **Business Intelligence (BI)** | Streamlit 1.54, Power BI Star Schema & DAX Measures |
+| **Business Intelligence (BI)** | Streamlit 1.54 |
 | **Development Environments** | Jupyter Notebooks (`nbformat`), Git |
 
 ---
@@ -118,7 +107,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Execute Master Analytics Pipeline
-Run the end-to-end pipeline to generate data, clean features, compute EDA plots, populate the SQLite database, execute SQL queries, perform segmentation, and train ML models in one step:
+Run the end-to-end pipeline to generate data, clean features, compute EDA plots, perform segmentation, and train ML models in one step:
 ```bash
 python src/run_pipeline.py
 ```
@@ -189,24 +178,6 @@ Using K-Means clustering on standardized financial vectors, borrowers were parti
 
 ![ROC Curves](reports/figures/10_model_roc_pr_curves.png)
 ![Confusion Matrix and Feature Importance](reports/figures/11_confusion_matrix_and_feature_importance.png)
-
----
-
-## 🗄️ Advanced SQL Analytics (15 Production Queries)
-
-The project includes an advanced SQL query suite in [`sql/advanced_sql_analytics.sql`](sql/advanced_sql_analytics.sql) executed automatically against SQLite. Highlights:
-- **Window Functions (`RANK`, `DENSE_RANK`, `NTILE`)**: Officer leaderboard and decile risk ranking.
-- **Time Intelligence (`LAG`, `LEAD`)**: Month-over-Month (MoM) recovery acceleration and cumulative recovery curves.
-- **Common Table Expressions (CTEs)**: Multi-step customer 360 profile and Loss Given Default (LGD) aggregations.
-
-Full tabular outputs and SQL explanations are documented in [`reports/sql_query_results.md`](reports/sql_query_results.md).
-
----
-
-## 📈 Power BI Architecture & DAX Measures
-- **Data Model Guide**: [`dashboard/powerbi/powerbi_data_model_guide.md`](dashboard/powerbi/powerbi_data_model_guide.md)
-- **DAX Formula Bank (25+ Measures)**: [`dashboard/powerbi/dax_measures_and_kpis.md`](dashboard/powerbi/dax_measures_and_kpis.md)
-- **UI/UX Visual Layout Specifications**: [`dashboard/powerbi/powerbi_visual_specifications.md`](dashboard/powerbi/powerbi_visual_specifications.md)
 
 ---
 

@@ -128,9 +128,9 @@ Rather than assigning delinquent cases randomly or alphabetically, accounts must
 ```
 +------------------------------------------------------------------------------------------+
 | PHASE 1 (Days 1 - 30): Foundation & Workflow Modernization                               |
-| - Deploy Master Clean Data Pipeline & SQLite/Postgres Reporting Database.                |
+| - Deploy Master Clean Data Pipeline & Preprocessing Workflows.                           |
 | - Integrate AI Recovery Probability Model (LightGBM) into Core Banking System.           |
-| - Launch Streamlit / Power BI Executive Dashboards for Regional Risk Managers.           |
+| - Launch Streamlit Executive Dashboards for Regional Risk Managers.                      |
 +------------------------------------------------------------------------------------------+
 | PHASE 2 (Days 31 - 60): EWS Deployment & Dynamic Routing                                 |
 | - Activate Early Warning System automated SMS/WhatsApp trigger rules.                    |

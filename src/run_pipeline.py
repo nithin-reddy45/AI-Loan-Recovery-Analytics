@@ -1,6 +1,6 @@
 """
 Master End-to-End Analytics Pipeline: AI-Driven Loan Recovery & Risk Analytics
-Executes the full pipeline: Data Generation -> Data Cleaning -> EDA Visuals -> SQL Analytics -> Segmentation -> ML Modeling.
+Executes the full pipeline: Data Generation -> Data Cleaning -> EDA Visuals -> Segmentation -> ML Modeling.
 """
 
 import sys
@@ -33,20 +33,13 @@ def run_full_pipeline():
     from src.eda_visualizations import run_eda
     run_eda(input_file="data/processed/loan_recovery_master.csv", output_dir="reports/figures")
     
-    # 4. SQL Analytics & Database Population
-    print("\n>>> STEP 4: Relational Database Build & Advanced SQL Analysis (15 Queries)...")
-    from sql.run_sql_analysis import build_database, execute_and_export_queries
-    conn = build_database(db_path="loan_recovery.db", processed_dir="data/processed")
-    execute_and_export_queries(conn, sql_file="sql/advanced_sql_analytics.sql", report_path="reports/sql_query_results.md")
-    conn.close()
-    
-    # 5. Customer & Loan Segmentation (K-Means + PCA)
-    print("\n>>> STEP 5: Customer & Loan Segmentation (K-Means & Personas)...")
+    # 4. Customer & Loan Segmentation (K-Means + PCA)
+    print("\n>>> STEP 4: Customer & Loan Segmentation (K-Means & Personas)...")
     from src.segmentation import run_segmentation
     run_segmentation(input_file="data/processed/loan_recovery_master.csv", output_dir="data/processed", fig_dir="reports/figures")
     
-    # 6. Predictive Machine Learning Modeling
-    print("\n>>> STEP 6: Predictive Machine Learning Modeling (LightGBM/XGBoost/RF/LR)...")
+    # 5. Predictive Machine Learning Modeling
+    print("\n>>> STEP 5: Predictive Machine Learning Modeling (LightGBM/XGBoost/RF/LR)...")
     from src.predictive_model import train_and_evaluate_models
     train_and_evaluate_models(input_file="data/processed/loan_recovery_master.csv", model_dir="models", fig_dir="reports/figures")
     
