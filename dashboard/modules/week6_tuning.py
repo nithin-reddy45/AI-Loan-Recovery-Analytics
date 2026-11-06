@@ -29,8 +29,8 @@ def render_week6():
     
     ignore_cols = ["customer_id", "loan_id", "recovery_id", "repayment_id", "recovery_status", "recovery_date", 
                    "last_payment_date", "default_date", "disbursement_date", "delinquency_bucket", "officer_name", 
-                   "recovery_officer_id", "officer_designation", "loan_purpose"]
-    target_names = ["recovery_status_binary", "recovered_amount", "net_recovery_amount", "default_flag", "loyal_customer"]
+                   "recovery_officer_id", "officer_designation", "loan_purpose", "settlement_discount_pct", "recovery_cost"]
+    target_names = ["recovery_status_binary", "recovered_amount", "net_recovery_amount", "recovery_rate_pct", "default_flag", "loyal_customer"]
     feat_cols = [c for c in df_features.select_dtypes(include=['number']).columns if c not in ignore_cols and c not in target_names]
     
     c1, c2 = st.columns(2)

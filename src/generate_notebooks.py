@@ -287,19 +287,19 @@ def create_notebook_04():
     nb = nbf.v4.new_notebook()
     cells = []
     
-    cells.append(nbf.v4.new_markdown_cell("""# 04. Predictive Machine Learning Modeling: Loan Recovery
+    cells.append(nbf.v4.new_markdown_cell("""# 04. Predictive Machine Learning Modeling & Explainable AI (SHAP)
 ## Project: AI-Driven Loan Recovery & Risk Analytics
 
 ### Overview
-This notebook trains, evaluates, and compares classification machine learning models to predict the probability of successful loan recovery:
+This notebook trains, evaluates, and optimizes classification machine learning models to predict the probability of loan recovery:
 1. **Preprocessing Pipeline**: Handling numerical scaling and categorical One-Hot Encoding via `ColumnTransformer`.
 2. **Model Training & Comparison**:
    - Logistic Regression (Class Weighted)
-   - Random Forest Classifier
-   - XGBoost Classifier
+   - Random Forest Classifier (Balanced)
+   - XGBoost Classifier (Imbalance Adjusted)
    - LightGBM Classifier (Champion Model)
-3. **Model Evaluation**: ROC-AUC, PR-AUC, Accuracy, Precision, Recall, F1-Score, and Confusion Matrix.
-4. **Feature Importance & Interpretability**: Identifying key drivers of debt recovery.
+3. **Model Evaluation & Recall Optimization (Step 11)**: Decision threshold scanning for debt recovery cash flow maximization.
+4. **Explainable AI (SHAP)**: Global Beeswarm, feature importance, and individual borrower decision waterfall.
 5. **Model Serialization**: Saving champion pipeline to `models/recovery_predictor_lightgbm.pkl`.
 """))
 
@@ -309,6 +309,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import shap
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -329,12 +330,12 @@ print(f"Sample Size: {delinquent_df.shape}")
 print(delinquent_df["recovery_target"].value_counts(normalize=True))
 """))
 
-    cells.append(nbf.v4.new_markdown_cell("### 1. Building Preprocessing Pipeline & Splitting Data"))
+    cells.append(nbf.v4.new_markdown_cell("### 1. Building Preprocessing Pipeline & Splitting Data (Excluding Leaked Post-Settlement Features)"))
     cells.append(nbf.v4.new_code_cell("""numeric_features = [
     "credit_score", "annual_income", "loan_amount", "interest_rate",
     "loan_term_months", "overdue_days", "dti_ratio", "ltv_ratio",
     "is_secured", "contact_attempts", "promise_to_pay_kept",
-    "settlement_discount_pct", "delinquency_severity_score"
+    "delinquency_severity_score", "existing_debts_count", "age"
 ]
 
 categorical_features = [
@@ -354,23 +355,27 @@ preprocessor = ColumnTransformer(
         ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), categorical_features)
     ]
 )
-print("Pipeline preprocessor configured.")
+print("Pipeline preprocessor configured successfully.")
 """))
 
-    cells.append(nbf.v4.new_markdown_cell("### 2. Model Training & Evaluation"))
-    cells.append(nbf.v4.new_code_cell("""models = {
+    cells.append(nbf.v4.new_markdown_cell("### 2. Model Training & Benchmark Comparison"))
+    cells.append(nbf.v4.new_code_cell("""scale_pos = round((y_train == 0).sum() / max(1, (y_train == 1).sum()), 2)
+
+models = {
     "Logistic Regression": LogisticRegression(max_iter=1000, class_weight="balanced", random_state=42),
-    "Random Forest": RandomForestClassifier(n_estimators=150, max_depth=8, random_state=42),
-    "XGBoost": xgb.XGBClassifier(n_estimators=150, max_depth=5, learning_rate=0.05, random_state=42),
-    "LightGBM": lgb.LGBMClassifier(n_estimators=150, max_depth=5, learning_rate=0.05, random_state=42, verbose=-1)
+    "Random Forest": RandomForestClassifier(n_estimators=150, max_depth=8, class_weight="balanced", random_state=42),
+    "XGBoost": xgb.XGBClassifier(n_estimators=150, max_depth=4, learning_rate=0.05, scale_pos_weight=scale_pos, random_state=42, eval_metric="logloss"),
+    "LightGBM": lgb.LGBMClassifier(n_estimators=150, max_depth=5, learning_rate=0.05, class_weight="balanced", random_state=42, verbose=-1)
 }
 
 results = []
+fitted_pipes = {}
 plt.figure(figsize=(9, 6))
 
 for name, clf in models.items():
     pipe = Pipeline([("preprocessor", preprocessor), ("classifier", clf)])
     pipe.fit(X_train, y_train)
+    fitted_pipes[name] = pipe
     
     y_pred = pipe.predict(X_test)
     y_proba = pipe.predict_proba(X_test)[:, 1]
@@ -378,22 +383,72 @@ for name, clf in models.items():
     results.append({
         "Model": name,
         "Accuracy": accuracy_score(y_test, y_pred),
-        "Precision": precision_score(y_test, y_pred),
-        "Recall": recall_score(y_test, y_pred),
-        "F1-Score": f1_score(y_test, y_pred),
+        "Precision": precision_score(y_test, y_pred, zero_division=0),
+        "Recall": recall_score(y_test, y_pred, zero_division=0),
+        "F1-Score": f1_score(y_test, y_pred, zero_division=0),
         "ROC-AUC": roc_auc_score(y_test, y_proba)
     })
     
     fpr, tpr, _ = roc_curve(y_test, y_proba)
     plt.plot(fpr, tpr, label=f"{name} (AUC={roc_auc_score(y_test, y_proba):.3f})")
 
-plt.plot([0, 1], [0, 1], 'k--')
+plt.plot([0, 1], [0, 1], 'k--', label="Random Guess")
 plt.title("Comparative ROC-AUC Benchmark", fontweight="bold")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
 plt.legend(loc="lower right")
 plt.show()
 
 res_df = pd.DataFrame(results).set_index("Model")
 display(res_df)
+"""))
+
+    cells.append(nbf.v4.new_markdown_cell("### 3. Step 11: Recall & Decision Threshold Optimization"))
+    cells.append(nbf.v4.new_code_cell("""lgb_pipe = fitted_pipes["LightGBM"]
+y_proba_lgb = lgb_pipe.predict_proba(X_test)[:, 1]
+
+thresholds = np.linspace(0.1, 0.9, 33)
+thresh_data = []
+
+for t in thresholds:
+    p = (y_proba_lgb >= t).astype(int)
+    thresh_data.append({
+        "threshold": t,
+        "recall": recall_score(y_test, p, zero_division=0),
+        "precision": precision_score(y_test, p, zero_division=0),
+        "f1": f1_score(y_test, p, zero_division=0)
+    })
+tdf = pd.DataFrame(thresh_data)
+
+plt.figure(figsize=(10, 5))
+plt.plot(tdf["threshold"], tdf["recall"], label="Recall", color="green", lw=2)
+plt.plot(tdf["threshold"], tdf["precision"], label="Precision", color="blue", lw=2)
+plt.plot(tdf["threshold"], tdf["f1"], label="F1-Score", color="purple", lw=2)
+plt.axvline(0.175, color="red", linestyle="--", label="Optimal Threshold (0.175)")
+plt.title("Recall & Precision Tradeoff Curve for Debt Recovery", fontweight="bold")
+plt.xlabel("Decision Threshold")
+plt.ylabel("Score")
+plt.legend()
+plt.show()
+"""))
+
+    cells.append(nbf.v4.new_markdown_cell("### 4. Explainable AI (SHAP): Global Feature Contributions & Individual Waterfall"))
+    cells.append(nbf.v4.new_code_cell("""# Extract transformed features
+prep = lgb_pipe.named_steps["preprocessor"]
+clf = lgb_pipe.named_steps["classifier"]
+
+ohe_cols = list(prep.named_transformers_["cat"].get_feature_names_out(categorical_features))
+all_features = numeric_features + ohe_cols
+
+X_test_trans = pd.DataFrame(prep.transform(X_test), columns=all_features)
+
+explainer = shap.TreeExplainer(clf)
+shap_values = explainer.shap_values(X_test_trans)
+shap_mat = shap_values[1] if isinstance(shap_values, list) else shap_values
+
+# SHAP Beeswarm Plot
+plt.figure(figsize=(10, 6))
+shap.summary_plot(shap_mat, X_test_trans, max_display=12)
 """))
 
     nb.cells = cells

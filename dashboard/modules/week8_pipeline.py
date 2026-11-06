@@ -39,8 +39,8 @@ def render_week8():
                 for c in num_cols:
                     df_pipe[c] = df_pipe[c].fillna(df_pipe[c].median())
                     
-                target_names = ["recovery_status_binary", "recovered_amount", "default_flag", "loyal_customer"]
-                ignore_cols = ["customer_id", "loan_id", "recovery_id", "repayment_id"]
+                target_names = ["recovery_status_binary", "recovered_amount", "net_recovery_amount", "recovery_rate_pct", "default_flag", "loyal_customer"]
+                ignore_cols = ["customer_id", "loan_id", "recovery_id", "repayment_id", "settlement_discount_pct", "recovery_cost"]
                 feat_cols = [c for c in df_pipe.select_dtypes(include=['number']).columns if c not in target_names and c not in ignore_cols]
                 
                 X = df_pipe[feat_cols]

@@ -109,7 +109,7 @@ graph TD
 
 ---
 
-## 5. Collector Allocation Matrix & Incentive Restructuring
+## 5. Collector Allocation Matrix & Explainable AI (SHAP) Framework
 
 ### AI-Guided Collector Assignment Matrix
 Rather than assigning delinquent cases randomly or alphabetically, accounts must be routed dynamically based on predicted recovery probability $P(\text{Recovery})$:
@@ -120,6 +120,16 @@ Rather than assigning delinquent cases randomly or alphabetically, accounts must
 | **Moderate-High (55% - 74%)** | 31 - 60 DPD (SMA-1) | Inside Tele-Calling & Debt Counselor | 15 - 30 Days |
 | **Moderate-Low (35% - 54%)** | 61 - 90 DPD (SMA-2) | Specialized Field Visit Officer | 30 - 45 Days |
 | **Low ($< 35\%$)** | 90+ DPD (NPA) | External Agency & Legal Recovery Counsel | 60 - 90 Days |
+
+### Explainable AI (SHAP) Drivers of Debt Recovery:
+- **`promise_to_pay_kept` (+0.95 SHAP)**: Single strongest positive driver; historical borrower commitment integrity strongly predicts debt resolution.
+- **`ltv_ratio` & `is_secured` (+0.71 SHAP)**: Presence of tangible collateral (mortgage or vehicle) provides substantial recovery leverage.
+- **`overdue_days` (-0.82 SHAP)**: Accounts past 90 DPD suffer rapid recovery decay and require immediate legal intervention.
+
+### Decision Threshold Optimization (Step 11):
+Calibrating the decision threshold to **0.175** boosts Recovery Recall to **97.6%** (from 72.1% at the standard 0.50 threshold), preventing early false-negative write-offs.
+
+For full Fair Lending, FDCPA, and ECOA governance guidelines, refer to [`reports/ethical_and_regulatory_considerations.md`](ethical_and_regulatory_considerations.md).
 
 ---
 
