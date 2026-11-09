@@ -1,0 +1,96 @@
+{
+    "model_name": "LightGBM Classifier",
+    "task": "Loan Recovery Probability Estimation",
+    "training_sample_size": 3017,
+    "test_sample_size": 755,
+    "metrics_default_threshold": {
+        "Accuracy": 0.6795,
+        "Precision": 0.7802,
+        "Recall": 0.7211,
+        "F1-Score": 0.7495,
+        "ROC-AUC": 0.7237,
+        "PR-AUC": 0.8281
+    },
+    "metrics_optimal_threshold": {
+        "threshold": 0.175,
+        "recall": 0.9761,
+        "precision": 0.6931,
+        "f1_score": 0.8106,
+        "roc_auc": 0.7237
+    },
+    "benchmark_comparison": {
+        "Logistic Regression": {
+            "Accuracy": 0.7126,
+            "Precision": 0.8174,
+            "Recall": 0.7311,
+            "F1-Score": 0.7718,
+            "ROC-AUC": 0.7607,
+            "PR-AUC": 0.8496
+        },
+        "Random Forest": {
+            "Accuracy": 0.6954,
+            "Precision": 0.8091,
+            "Recall": 0.7092,
+            "F1-Score": 0.7558,
+            "ROC-AUC": 0.7442,
+            "PR-AUC": 0.8354
+        },
+        "XGBoost": {
+            "Accuracy": 0.6993,
+            "Precision": 0.8009,
+            "Recall": 0.7291,
+            "F1-Score": 0.7633,
+            "ROC-AUC": 0.737,
+            "PR-AUC": 0.8415
+        },
+        "LightGBM": {
+            "Accuracy": 0.6795,
+            "Precision": 0.7802,
+            "Recall": 0.7211,
+            "F1-Score": 0.7495,
+            "ROC-AUC": 0.7237,
+            "PR-AUC": 0.8281
+        }
+    },
+    "features": {
+        "numeric": [
+            "credit_score",
+            "annual_income",
+            "loan_amount",
+            "interest_rate",
+            "loan_term_months",
+            "overdue_days",
+            "dti_ratio",
+            "ltv_ratio",
+            "is_secured",
+            "contact_attempts",
+            "promise_to_pay_kept",
+            "delinquency_severity_score",
+            "existing_debts_count",
+            "age"
+        ],
+        "categorical": [
+            "loan_type",
+            "region",
+            "city_tier",
+            "employment_status",
+            "housing_status",
+            "collateral_type",
+            "origination_channel",
+            "primary_channel"
+        ],
+        "total_transformed_features": 57
+    },
+    "optimal_recovery_threshold": 0.175,
+    "explainable_ai": {
+        "framework": "SHAP (SHapley Additive exPlanations)",
+        "explainer_type": "TreeExplainer",
+        "top_drivers": [
+            "promise_to_pay_kept",
+            "ltv_ratio",
+            "delinquency_severity_score",
+            "credit_score",
+            "age"
+        ]
+    }
+}

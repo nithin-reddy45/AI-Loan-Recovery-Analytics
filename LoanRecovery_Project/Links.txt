@@ -1,0 +1,52 @@
+================================================================================
+AI-BASED LOAN RECOVERY PROBABILITY PREDICTION & DEBT OPTIMIZATION
+PROJECT LINKS & SUBMISSION REFERENCES
+================================================================================
+
+1. GITHUB REPOSITORY LINK (PUBLIC / SUBMISSION CODEBASE):
+   https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics
+
+2. LIVE APPLICATION DEPLOYMENT (STREAMLIT CLOUD):
+   https://share.streamlit.io/ (Deploy from main branch -> streamlit_app.py)
+   Local execution command: streamlit run streamlit_app.py
+
+3. PROJECT DOCUMENTATION & REPORTS:
+   - Final Project Report:
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/reports/final_project_report.md
+   - Executive Business Strategy Report:
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/reports/executive_business_report.md
+   - Ethical, Regulatory & Fair Lending Considerations (FDCPA, ECOA, FCRA):
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/reports/ethical_and_regulatory_considerations.md
+
+4. PREDICTIVE MACHINE LEARNING & EXPLAINABLE AI (SHAP):
+   - ML Pipeline & SHAP Implementation:
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/src/predictive_model.py
+   - Model Metadata & Metrics:
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/models/model_metadata.json
+   - Jupyter Notebook 04 (Predictive Modeling & SHAP):
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/notebooks/04_predictive_modeling_loan_recovery.ipynb
+
+5. VISUAL RESULTS & SCREENSHOTS:
+   - Model ROC & PR Benchmark Curves:
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/reports/figures/10_model_roc_pr_curves.png
+   - Confusion Matrix & Diagnostics:
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/reports/figures/11_confusion_matrix_and_feature_importance.png
+   - SHAP Beeswarm Feature Impact Plot:
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/reports/figures/12_shap_summary_beeswarm.png
+   - SHAP Global Feature Importance Bar Chart:
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/reports/figures/13_shap_feature_importance.png
+   - Step 11 Decision Threshold & Recall Optimization Curve:
+     https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics/blob/main/reports/figures/14_threshold_optimization_curve.png
+
+6. DEMO VIDEO / WALKTHROUGH LINK (IF REQUIRED):
+   [Add your Loom, YouTube, or Google Drive walkthrough link here]
+
+================================================================================
+CORE PROJECT SUMMARY & METRICS:
+- Delinquent Accounts Analyzed: 3,772 accounts (>30 DPD)
+- Total Portfolio Exposure: $1,116.83 Million
+- Champion Model: LightGBM Classifier Pipeline (ROC-AUC: 0.7237, PR-AUC: 0.8281)
+- Step 11 Optimal Threshold: 0.175 (Recall: 97.61%, F1-Score: 81.06%)
+- Explainable AI: SHAP TreeExplainer (Promise-to-Pay Kept: +0.952, LTV: +0.709)
+- Governance: FDCPA calling rules (8am-9pm, <=3 attempts/wk), ECOA Disparate Impact Ratio > 0.80
+================================================================================

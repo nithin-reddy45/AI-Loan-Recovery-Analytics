@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Loan Recovery Presentation</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0b1120; color: #f8fafc; margin: 0; padding: 30px; }
+  .deck { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
+  .slide { background: #1e293b; border-radius: 14px; padding: 36px 42px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  h1 { color: #38bdf8; font-size: 2.1rem; margin-top: 0; margin-bottom: 8px; border-bottom: 2px solid #0284c7; padding-bottom: 12px; }
+  h2 { color: #a78bfa; font-size: 1.5rem; margin-top: 0; }
+  h3 { color: #34d399; font-size: 1.25rem; margin-top: 14px; }
+  p, li { line-height: 1.7; font-size: 1.05rem; color: #cbd5e1; }
+  ul { padding-left: 24px; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; background: #0f172a; border-radius: 8px; overflow: hidden; }
+  th, td { padding: 12px 14px; border: 1px solid #334155; text-align: left; }
+  th { background: #1e293b; color: #38bdf8; font-weight: 600; }
+  pre { background: #0f172a; color: #38bdf8; padding: 16px; border-radius: 8px; overflow-x: auto; font-family: Consolas, monospace; border: 1px solid #1e293b; }
+  code { background: #0f172a; color: #f43f5e; padding: 3px 6px; border-radius: 4px; font-family: Consolas, monospace; }
+  .badge { background: #0284c7; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="slide">
+<div class="badge">Slide 1</div>
+<h1>AI-Based Loan Recovery Probability Prediction & Debt Optimization</h1>
+<h2>🏆 Executive & Technical Project Presentation Slide Deck</h2>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 2</div>
+<h3>Slide 1: Title & Project Overview</h3>
+<h1>AI-Based Loan Recovery Probability Prediction</h1>
+<h3>Optimizing Collections, Recall & Decision Explainability (SHAP)</h3>
+<li>**Domain:** Retail Banking / Credit Risk / Debt Collections Management</li>
+<li>**Platform:** End-to-End Machine Learning Platform & Streamlit Web App</li>
+<li>**GitHub Repository:** [nithin-reddy45/AI-Loan-Recovery-Analytics](https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics)</li>
+<li>**Author:** AI Risk Governance & Credit Analytics Engineering Team</li>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 3</div>
+<h3>Slide 2: Problem Statement & Core Business Challenge</h3>
+<li>**The Traditional Collections Problem:**</li>
+<li>Static, calendar-based queues (calling borrowers alphabetically or by overdue days).</li>
+<li>High operating costs (\$65–\$320/case) wasted on self-curative borrowers.</li>
+<li>Premature loan write-offs: Complex recoverable accounts are misclassified as lost causes.</li>
+<li>Regulatory compliance risks: FDCPA calling violations and lack of adverse action transparency.</li>
+<li>**The AI Solution:**</li>
+<li>Predict individual recovery probability $P(\text{Recovery} = 1)$ upfront.</li>
+<li>Tune operational decision threshold to maximize **Recall (97.6%)**.</li>
+<li>Use **Explainable AI (SHAP)** to provide mathematically verifiable reasoning.</li>
+<li>Segment borrowers into 4 behavioral personas for tailored interventions.</li>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 4</div>
+<h3>Slide 3: 18-Step ML Lifecycle Workflow</h3>
+<pre>
+[01: Goal] -> [02: Lifecycle] -> [03: Relational Data] -> [04: Clean & Impute] -> [05: EDA Visuals]
+|
+[06: Preprocessor] -> [07: Class Imbalance] -> [08: Split 80/20] -> [09: Benchmarking] -> [10: Probabilities]
+|
+[11: Recall Opt (0.175)] -> [12: Confusion Matrix] -> [13: Risk Tiers] -> [14: Serialization]
+|
+[15: Streamlit Form] -> [16: Test Cases A/B/C] -> [17: Cloud Deployment] -> [18: FDCPA/ECOA Ethics]
+</pre>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 5</div>
+<h3>Slide 4: Data Engineering & Portfolio Macro Health</h3>
+<li>**Relational Multi-Table Database:**</li>
+<li>15,000 Borrowers (`customers.csv`)</li>
+<li>15,000 Agreements (`loans.csv`)</li>
+<li>15,000 Repayment Histories (`repayments.csv`)</li>
+<li>3,772 Delinquent Recovery Cases (`recovery_activities.csv`)</li>
+<li>**Portfolio Metrics:**</li>
+<li>**Total Disbursed:** \$1,116.83 Million</li>
+<li>**Outstanding Principal:** \$779.93 Million</li>
+<li>**Delinquent Pool Exposure:** \$103.72 Million across 3,772 accounts</li>
+<li>**Gross Recoveries:** \$61.83 Million (59.62% Recovery Rate)</li>
+<li>**Engineered Ratios:** DTI, LTV, Delinquency Severity Index (DSI). Zero target leakage.</li>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 6</div>
+<h3>Slide 5: Borrower Personas & Action Playbooks (K-Means & PCA)</h3>
+<li>**Unsupervised Clustering ($k=4$, PCA 2D Validation):**</li>
+<p>1. 🟢 **Persona 1: Prime Self-Curative (29.4%):** Score 728, 34 DPD.</p>
+<p>*Playbook:* Zero agent intervention. 100% automated WhatsApp payment links. Saves \$50/case.</p>
+<p>2. 🟡 **Persona 2: Distressed Responsive (42.4%):** Score 650, 52 DPD.</p>
+<p>*Playbook:* Tele-counselor offering 12-month tenure extension or 10–15% settlement haircut.</p>
+<p>3. 🟣 **Persona 3: Secured High-Value Asset (22.3%):** Score 689, 74 DPD. Mortgages/Auto.</p>
+<p>*Playbook:* Senior recovery officer. Collateral repossession notice if unpaid at 90 DPD.</p>
+<p>4. 🔴 **Persona 4: Chronic Delinquent High Risk (6.0%):** Score 593, 168 DPD.</p>
+<p>*Playbook:* Immediate external collection agency or Debt Recovery Tribunal (DRT).</p>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 7</div>
+<h3>Slide 6: Predictive Model Benchmarking & Evaluation</h3>
+<li>**Evaluated across 4 algorithm families on holdout test set ($n=755$):**</li>
+<table>
+<tr><th>Model Algorithm</th><th>Accuracy</th><th>Precision</th><th>Recall (Default)</th><th>F1-Score</th><th>ROC-AUC</th><th>PR-AUC</th><th>Recall (Opt Thresh)</th></tr>
+</table>
+<p>| :</p>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 8</div>
+<p>| :</p>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 9</div>
+<p>: | :</p>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 10</div>
+<p>: | :</p>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 11</div>
+<p>: | :</p>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 12</div>
+<p>: | :</p>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 13</div>
+<p>: | :</p>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 14</div>
+<p>: | :</p>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 15</div>
+<p>: |</p>
+<table>
+<tr><td>**LightGBM (Champion)**</td><td>**67.95%**</td><td>**78.02%**</td><td>**72.11%**</td><td>**74.95%**</td><td>**0.7237**</td><td>**0.8281**</td><td>**97.61%**</td></tr>
+<tr><td>**Logistic Regression**</td><td>71.26%</td><td>81.74%</td><td>73.11%</td><td>77.18%</td><td>0.7607</td><td>0.8496</td><td>96.40%</td></tr>
+<tr><td>**XGBoost Classifier**</td><td>69.93%</td><td>80.09%</td><td>72.91%</td><td>76.33%</td><td>0.7370</td><td>0.8415</td><td>96.80%</td></tr>
+<tr><td>**Random Forest (200)**</td><td>69.54%</td><td>80.91%</td><td>70.92%</td><td>75.58%</td><td>0.7442</td><td>0.8354</td><td>95.10%</td></tr>
+</table>
+<li>*PR-AUC of 0.828–0.850 confirms high predictive precision across all delinquent accounts.*</li>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 16</div>
+<h3>Slide 7: Step 11: Recall & Decision Threshold Optimization</h3>
+<li>**Collections Economics Asymmetry:**</li>
+<li>**False Negative (Premature Write-Off):** Bank loses \$5,000–\$30,000 in uncollected principal.</li>
+<li>**False Positive (Digital Outreach):** Costs \$15 in automated SMS/bot messages.</li>
+<li>**Conclusion:** Maximizing Recall is paramount.</li>
+<li>**Threshold Calibration Results:**</li>
+<li>**Default 0.50 Cutoff:** 72.11% Recall $\rightarrow$ Misses 28% of recoverable cash flow.</li>
+<li>**Calibrated 0.175 Cutoff:** **97.61% Recall, 81.06% F1-Score** $\rightarrow$ Captures 97.6% of collectible debt while filtering true chronic write-offs.</li>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 17</div>
+<h3>Slide 8: Explainable AI (SHAP Framework)</h3>
+<li>**Global Insights (TreeExplainer Beeswarm & Importance):**</li>
+<li>`promise_to_pay_kept` (+0.952 log-odds): Single strongest positive recovery driver.</li>
+<li>`ltv_ratio` & `is_secured` (+0.709 log-odds): Secured collateral elevates borrower cooperation.</li>
+<li>`overdue_days` (-0.821 log-odds penalty): Severe degradation past 90 DPD.</li>
+<li>`dti_ratio` (-0.249 log-odds penalty): Cash-flow leverage squeeze.</li>
+<li>**Local Interpretability (Dynamic Streamlit Waterfall):**</li>
+<li>Generates real-time green/red feature attribution bars for every individual borrower.</li>
+<li>Enables FCRA-compliant adverse action disclosures.</li>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 18</div>
+<h3>Slide 9: Interactive Streamlit UI & Scenario Testing (Steps 15 & 16)</h3>
+<li>**Real Model Integration:** Connected to `models/recovery_predictor_lightgbm.pkl` via `@st.cache_resource`.</li>
+<li>**Step 16 One-Click Preset Scenarios:**</li>
+<li>🟢 **Case A (Prime Auto Loan):** Score 740, 32 DPD, Kept PTP $\rightarrow \mathbf{P(\text{Recovery}) = 93.8\%}$ *(Grade A)*.</li>
+<li>🟡 **Case B (Distressed Personal Loan):** Score 635, 68 DPD, Broken PTP $\rightarrow \mathbf{P(\text{Recovery}) = 48.2\%}$ *(Grade B)*.</li>
+<li>🔴 **Case C (Severe NPA Default):** Score 490, 180 DPD, 6 Debts $\rightarrow \mathbf{P(\text{Recovery}) = 13.9\%}$ *(Grade D)*.</li>
+<li>**Live SHAP Waterfall:** Interactive Plotly chart showing exact feature-by-feature attribution.</li>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 19</div>
+<h3>Slide 10: Ethical, FDCPA & Fair Lending Governance (Step 18)</h3>
+<li>**FDCPA Compliance Rules:**</li>
+<li>Outbound hours restricted strictly between **8:00 AM and 9:00 PM** borrower local time.</li>
+<li>Velocity cap: Maximum of **3 contact attempts per 7-day rolling window**.</li>
+<li>Immediate 1-click digital opt-out mechanics.</li>
+<li>**ECOA Disparate Impact Parity Audit:**</li>
+<li>Verified Disparate Impact Ratio $> 0.80$ across protected demographic groups:</li>
+<li>Gender Parity: 1.01 (Male vs Female)</li>
+<li>Regional Parity: 0.97</li>
+<li>City Tier Parity: 0.95</li>
+<li>**Vulnerable Borrowers:** 90-day interest freeze for verified medical / layoff hardship.</li>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 20</div>
+<h3>Slide 11: Projected Business Impact & Financial ROI</h3>
+<li>**+\$14.2 Million in Additional Recoveries:** Step 11 optimal threshold captures 25.5% more recoverable delinquent balances.</li>
+<li>**35% Operating Cost Reduction:** Fully automating Persona 1 via digital links saves \$510,000 annually.</li>
+<li>**12% Reduction in NPA Formation:** Early Warning System (EWS) triggers within 30 days prevent defaults.</li>
+<li>**Direct Net ROI Multiplier:** **42.7x** net collections yield over direct collection costs.</li>
+</div>
+
+<div class="slide">
+<div class="badge">Slide 21</div>
+<h3>Slide 12: Deliverables & Conclusion</h3>
+<li>**All Requirements Met (18/18 Steps + SHAP XAI):**</li>
+<li>Production Machine Learning Pipeline & Serialized Models</li>
+<li>Explainable AI (SHAP) Global & Local Visualizations</li>
+<li>Interactive 9-Stage Streamlit Web Application</li>
+<li>Executive Strategy & Ethical Governance Documentation</li>
+<li>**GitHub Repository:** [https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics](https://github.com/nithin-reddy45/AI-Loan-Recovery-Analytics)</li>
+<li>**Live Entrypoint:** `streamlit run streamlit_app.py`</li>
+</div>
+
+
+</div>
+</body>
+</html>

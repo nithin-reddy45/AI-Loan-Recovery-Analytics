@@ -16,7 +16,10 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# IDE & Editor
+# Archives
+*.zip
+*.tar.gz
+*.rar
 .vscode/
 .idea/
 *.swp
