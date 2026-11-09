@@ -19,3 +19,4 @@ This directory contains the visual artifacts, model diagnostic plots, Explainabl
 | **`12_shap_summary_beeswarm.png`** | **Explainable AI (SHAP)** Summary Beeswarm plot showing global distribution and directional impact of features on recovery odds. |
 | **`13_shap_feature_importance.png`** | **Explainable AI (SHAP)** Global feature importance bar chart ranked by mean absolute SHAP value (log-odds impact). |
 | **`14_threshold_optimization_curve.png`** | **Step 11 Recall Optimization** tradeoff curve across 33 decision thresholds, highlighting the calibrated 0.175 optimal cutoff. |
+

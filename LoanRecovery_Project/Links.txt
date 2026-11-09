@@ -50,3 +50,4 @@ CORE PROJECT SUMMARY & METRICS:
 - Explainable AI: SHAP TreeExplainer (Promise-to-Pay Kept: +0.952, LTV: +0.709)
 - Governance: FDCPA calling rules (8am-9pm, <=3 attempts/wk), ECOA Disparate Impact Ratio > 0.80
 ================================================================================
+
